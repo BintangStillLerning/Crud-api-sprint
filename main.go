@@ -17,7 +17,7 @@ import (
 func main() {
 
 	// ================= DATABASE =================
-	dbURL := os.Getenv("DATABASE_URL")
+	dbURL := os.Getenv("root:password@tcp(containers-us-west-xxx.railway.app:6543)/railway")
 
 	if dbURL == "" {
 		log.Fatal("DATABASE_URL not set")
