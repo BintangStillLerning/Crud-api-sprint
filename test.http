@@ -1,0 +1,29 @@
+### GET ALL PRODUCT
+GET http://localhost:8080/products
+Accept: "application/json"  
+
+### Create New Product
+POST http://localhost:8080/products
+Content-Type: "application/json"
+Accept: : "application/json"
+
+{
+    "name": "mamang",
+    "price": 20000,
+    "image": "batu.png"
+}
+
+### Delete Product
+DELETE http://localhost:8080/products/1
+Accept: "application/json"
+
+### Update Product
+PUT http://localhost:8080/products/2
+Content-Type: "application/json"
+Accept: "application/json"
+
+{
+    "name": "Cungpruy",
+    "price": 35000,
+    "image": "ganteng.jpg"
+}
