@@ -8,15 +8,29 @@ import (
 	"log"
 	"net/http"
 	"os"
-
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/julienschmidt/httprouter"
 )
 
+func corsMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
+		w.Header().Set("Access-Control-Allow-Origin", "*")
+		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
+		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+
+		if r.Method == "OPTIONS" {
+			w.WriteHeader(http.StatusOK)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 func main() {
 
-	// ================= DATABASE =================
 	dbURL := os.Getenv("DATABASE_URL")
 
 	if dbURL == "" {
@@ -46,12 +60,15 @@ func main() {
 	router.DELETE("/products/:productId", productController.Delete)
 	router.PUT("/products/:productId", productController.Update)
 
-	// ================= PORT =================
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
 	log.Println("Server running on :" + port)
-	log.Fatal(http.ListenAndServe(":"+port, router))
+
+	// Bungkus router dengan CORS
+	handler := corsMiddleware(router)
+
+	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
