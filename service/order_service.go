@@ -1,0 +1,92 @@
+package service
+
+import (
+	"context"
+	"database/sql"
+	"golang-api/domain/web"
+	"golang-api/repository"
+)
+
+type OrderService interface {
+	Create(ctx context.Context, request web.Order) web.OrderResponse
+}
+
+type orderServiceImpl struct {
+	OrderRepository   repository.OrderRepository
+	ProductRepository repository.ProductRepository
+	DB                *sql.DB
+}
+
+func NewOrderService(
+	orderRepo repository.OrderRepository,
+	productRepo repository.ProductRepository,
+	db *sql.DB,
+) OrderService {
+	return &orderServiceImpl{
+		OrderRepository:   orderRepo,
+		ProductRepository: productRepo,
+		DB:                db,
+	}
+}
+
+func (s *orderServiceImpl) Create(ctx context.Context, request web.Order) web.OrderResponse {
+
+	tx, err := s.DB.Begin()
+	if err != nil {
+		panic(err)
+	}
+	defer tx.Rollback()
+
+	total := 0
+
+	order := web.Order{
+		CustomerName: request.CustomerName,
+		Payment:      request.Payment,
+		Status:       "PAID",
+	}
+
+	// Hitung total
+	for _, item := range request.Items {
+
+		product, err := s.ProductRepository.FindById(ctx, tx, item.ProductID)
+		if err != nil {
+			panic(err)
+		}
+
+		subtotal := product.Price * item.Quantity
+		total += subtotal
+	}
+
+	order.Total = total
+
+	// Save order
+	order = s.OrderRepository.Save(ctx, tx, order)
+
+	// Save order items
+	for _, item := range request.Items {
+
+		product, err := s.ProductRepository.FindById(ctx, tx, item.ProductID)
+		if err != nil {
+			panic(err)
+		}
+
+		orderItem := web.OrderItem{
+			ProductID: product.Id,
+			Quantity:  item.Quantity,
+		}
+
+		s.OrderRepository.SaveItem(ctx, tx, orderItem)
+	}
+
+	err = tx.Commit()
+	if err != nil {
+		panic(err)
+	}
+
+	return web.OrderResponse{
+		CustomerName: order.CustomerName,
+		Total:        order.Total,
+		Payment:      order.Payment,
+		Status:       order.Status,
+	}
+}

@@ -1,9 +1,8 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "Product Restful API",
-    "version": "1.0.0",
-    "description": "This is a sample API specification."
+    "title": "Product & Order API",
+    "version": "1.0.0"
   },
   "servers": [
     {
@@ -11,69 +10,97 @@
     }
   ],
   "paths": {
+
     "/product": {
       "get": {
-        "tags": ["Product API"],
-        "summary": "List All Products",
+        "tags": ["Product"],
+        "summary": "Get All Products",
         "responses": {
           "200": {
-            "description": "Success to Get All Products",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProductListResponse"
-                }
-              }
-            }
+            "description": "Success"
           }
         }
       },
       "post": {
-        "tags": ["Product API"],
+        "tags": ["Product"],
         "summary": "Create Product",
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ProductCreateRequest"
-              }
-            }
-          }
-        },
         "responses": {
           "201": {
-            "description": "Success to Create Product",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ProductResponse"
-                }
-              }
-            }
+            "description": "Created"
           }
+        }
+      }
+    },
+
+    "/product/{productId}": {
+      "get": {
+        "tags": ["Product"],
+        "summary": "Get Product By ID",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Success" }
+        }
+      },
+      "put": {
+        "tags": ["Product"],
+        "summary": "Update Product",
+        "parameters": [
+          {
+            "name": "productId",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Updated" }
         }
       },
       "delete": {
-         "tags": ["Category API"],
+        "tags": ["Product"],
         "summary": "Delete Product",
         "parameters": [
           {
             "name": "productId",
             "in": "path",
             "required": true,
-            "schema": {
-              "type": "integer"
-            }
+            "schema": { "type": "integer" }
           }
         ],
         "responses": {
+          "200": { "description": "Deleted" }
+        }
+      }
+    },
+
+    "/order": {
+      "post": {
+        "tags": ["Order"],
+        "summary": "Create Order (Auto Check Stock)",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OrderCreateRequest"
+              }
+            }
+          }
+        },
+        "responses": {
           "200": {
-            "description": "Success Delete Product",
+            "description": "Order Created",
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ProductDeleteRequest"
+                  "$ref": "#/components/schemas/OrderResponse"
                 }
               }
             }
@@ -81,78 +108,66 @@
         }
       }
     }
+
   },
+
   "components": {
-    "securitySchemes": {
-      "CategoryAuth": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "X-Api-apiKey",
-        "description": "Authentication For Category API"
-      }
-    },
     "schemas": {
-      "Product": {
+
+      "OrderItem": {
         "type": "object",
+        "required": ["productId", "quantity"],
         "properties": {
-          "id": {
-            "type": "integer"
-          },
-          "name": {
-            "type": "string"
-          },
-          "price": {
-            "type": "integer"
-          },
-          "image": {
-            "type": "string"
-          }
+          "productId": { "type": "integer" },
+          "quantity": { "type": "integer" }
         }
       },
-      "ProductResponse": {
+
+      "OrderCreateRequest": {
         "type": "object",
+        "required": ["customerName", "items", "payment"],
         "properties": {
-          "data": {
-            "$ref": "#/components/schemas/Product"
-          }
-        }
-      },
-      "ProductListResponse": {
-        "type": "object",
-        "properties": {
-          "data": {
+          "customerName": { "type": "string" },
+          "payment": { "type": "string" },
+          "items": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/Product"
+              "$ref": "#/components/schemas/OrderItem"
             }
           }
         }
       },
-      "ProductCreateRequest": {
+
+      "Order": {
         "type": "object",
-        "required": ["name", "price"],
         "properties": {
-          "name": {
-            "type": "string"
+          "id": { "type": "integer" },
+          "customerName": { "type": "string" },
+          "total": { "type": "integer" },
+          "payment": { "type": "string" },
+          "status": { "type": "string" },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
           },
-          "price": {
-            "type": "integer"
-          },
-          "image": {
-            "type": "string"
+          "items": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OrderItem"
+            }
           }
         }
       },
-      "ProductDeleteRequest":{
+
+      "OrderResponse": {
         "type": "object",
         "properties": {
-          "code": { "type": "integer" },
-          "status": { "type": "string" },
           "data": {
-            "$ref": "#/components/schemas/ProductDeleteRequest"
+            "$ref": "#/components/schemas/Order"
           }
         }
       }
+
     }
   }
 }

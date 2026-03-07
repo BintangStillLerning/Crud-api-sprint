@@ -27,3 +27,17 @@ Accept: "application/json"
     "price": 35000,
     "image": "ganteng.jpg"
 }
+
+POST http://localhost:8080/order
+Content-Type: "application/json"
+Accept: "application/json"
+{
+    "customerName": "Cungpret",
+    "payment": "CASH",
+    "items": [
+        {
+            "productId": 1,
+            "quantity": 2
+        }
+    ]
+}

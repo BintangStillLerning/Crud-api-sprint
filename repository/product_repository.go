@@ -12,6 +12,7 @@ type ProductRepository interface {
 	FindAll(ctx context.Context, db *sql.DB) []domain.Product
 	Update(ctx context.Context, tx *sql.Tx, product domain.Product) domain.Product
 	Delete(ctx context.Context, tx *sql.Tx, productId int)
+	FindById(ctx context.Context, tx *sql.Tx, productId int)(domain.Product, error)
 }
 
 type productRepositoryImpl struct{}
@@ -70,4 +71,27 @@ func (r *productRepositoryImpl) FindAll(ctx context.Context, db *sql.DB) []domai
 	}
 
 	return products
+}
+
+func (r *productRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, productId int) (domain.Product, error) {
+
+	SQL := "SELECT id, name, price, image FROM nicesu WHERE id = ?"
+
+	rows, err := tx.QueryContext(ctx, SQL, productId)
+	if err != nil {
+		return domain.Product{}, err
+	}
+	defer rows.Close()
+
+	product := domain.Product{}
+
+	if rows.Next() {
+		err := rows.Scan(&product.Id, &product.Name, &product.Price, &product.Image)
+		if err != nil {
+			return domain.Product{}, err
+		}
+		return product, nil
+	} else {
+		return domain.Product{}, sql.ErrNoRows
+	}
 }

@@ -8,6 +8,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+
 	"github.com/go-playground/validator/v10"
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/julienschmidt/httprouter"
@@ -32,7 +33,6 @@ func corsMiddleware(next http.Handler) http.Handler {
 func main() {
 
 	dbURL := os.Getenv("DATABASE_URL")
-
 	if dbURL == "" {
 		log.Fatal("DATABASE_URL not set")
 	}
@@ -49,16 +49,32 @@ func main() {
 
 	validate := validator.New()
 
+	// =========================
+	// PRODUCT DEPENDENCY
+	// =========================
 	productRepository := repository.NewProductRepository()
 	productService := service.NewProductService(productRepository, db, validate)
 	productController := controller.NewProductController(productService)
 
+	// =========================
+	// ORDER DEPENDENCY
+	// =========================
+	orderRepository := repository.NewOrderRepository()
+	orderService := service.NewOrderService(orderRepository, productRepository, db)
+	orderController := controller.NewOrderController(orderService)
+
+	// =========================
+	// ROUTER
+	// =========================
 	router := httprouter.New()
 
 	router.POST("/products", productController.Create)
 	router.GET("/products", productController.FindAll)
 	router.DELETE("/products/:productId", productController.Delete)
-	router.PUT("/products/:productId", productController.Update)
+	router.PUT("/products/:productId", orderController.Create)
+	
+
+	router.POST("/order", orderController.Create)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -67,7 +83,6 @@ func main() {
 
 	log.Println("Server running on :" + port)
 
-	// Bungkus router dengan CORS
 	handler := corsMiddleware(router)
 
 	log.Fatal(http.ListenAndServe(":"+port, handler))
