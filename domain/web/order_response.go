@@ -19,3 +19,4 @@ type OrderItemResponse struct {
 	Price       int    `json:"price"`
 	Subtotal    int    `json:"subtotal"`
 }
+

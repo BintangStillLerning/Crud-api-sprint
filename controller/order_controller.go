@@ -20,6 +20,8 @@ func NewOrderController(service service.OrderService) OrderController {
 }
 
 func (c OrderController) Create(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+	defer r.Body.Close()
+
 	var request web.Order
 
 	err := json.NewDecoder(r.Body).Decode(&request)
@@ -31,5 +33,10 @@ func (c OrderController) Create(w http.ResponseWriter, r *http.Request, _ httpro
 	response := c.orderService.Create(r.Context(), request)
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(response)
+	w.WriteHeader(http.StatusCreated)
+
+	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }

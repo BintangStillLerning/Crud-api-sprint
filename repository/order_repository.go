@@ -19,7 +19,7 @@ func NewOrderRepository() OrderRepository {
 
 func (r *orderRepository) Save(ctx context.Context, tx *sql.Tx, order web.Order) web.Order {
 
-	query := "INSERT INTO orders(customer_name, total, payment, status, created_at) VALUES (?, ?, ?, ?, NOW())"
+	query := "INSERT INTO orderss(customer_name, total, payment, status, created_at) VALUES (?, ?, ?, ?, NOW())"
 
 	result, err := tx.ExecContext(ctx, query,
 		order.CustomerName,
@@ -27,6 +27,7 @@ func (r *orderRepository) Save(ctx context.Context, tx *sql.Tx, order web.Order)
 		order.Payment,
 		order.Status,
 	)
+
 	if err != nil {
 		panic(err)
 	}
@@ -39,12 +40,13 @@ func (r *orderRepository) Save(ctx context.Context, tx *sql.Tx, order web.Order)
 
 func (r *orderRepository) SaveItem(ctx context.Context, tx *sql.Tx, item web.OrderItem) {
 
-	query := "INSERT INTO order_items(order_id, product_id, quantity, price) VALUES (?, ?, ?, ?)"
+	query := "INSERT INTO order_items(product_id, quantity) VALUES (?, ?)"
 
 	_, err := tx.ExecContext(ctx, query,
 		item.ProductID,
 		item.Quantity,
 	)
+
 	if err != nil {
 		panic(err)
 	}
