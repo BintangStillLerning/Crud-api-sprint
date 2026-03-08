@@ -71,11 +71,10 @@ func main() {
 	router.POST("/products", productController.Create)
 	router.GET("/products", productController.FindAll)
 	router.DELETE("/products/:productId", productController.Delete)
-	router.POST("/order", orderController.Create)
-	router.PUT("/order/:orderId", orderController.Create)
+	router.POST("/orders", orderController.Create)
+	router.PUT("/orders/:ordersId", orderController.Create)
 	
 
-	router.POST("/order", orderController.Create)
 
 	port := os.Getenv("PORT")
 	if port == "" {
