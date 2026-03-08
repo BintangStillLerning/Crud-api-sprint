@@ -27,7 +27,7 @@ func (c OrderController) Create(w http.ResponseWriter, r *http.Request, _ httpro
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
+		return 
 	}
 
 	response := c.orderService.Create(r.Context(), request)
