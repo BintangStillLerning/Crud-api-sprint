@@ -1,5 +1,6 @@
 package domain
 
+import "database/sql"
 
 type Order struct {
 	ID           int
@@ -7,5 +8,5 @@ type Order struct {
 	Total        int
 	Payment      string
 	Status       string
-	Created_at   string
+	Created_at   sql.NullString
 }
