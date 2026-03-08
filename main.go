@@ -83,7 +83,7 @@ func main() {
 
 	log.Println("Server running on :" + port)
 
-	handler := corsMiddleware(router)
+	handler := corsMiddleware(router)	
 
 	log.Fatal(http.ListenAndServe(":"+port, handler))
 }
