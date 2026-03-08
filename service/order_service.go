@@ -43,22 +43,13 @@ func (s *orderServiceImpl) Create(ctx context.Context, request web.Order) web.Or
 	order := web.Order{
 		CustomerName: request.CustomerName,
 		Payment:      request.Payment,
-		Status:       "PAID",
+		Status:       request.Status,
 	}
 
 	// Hitung total
-	for _, item := range request.Items {
 
-		product, err := s.ProductRepository.FindById(ctx, tx, item.ProductID)
-		if err != nil {
-			panic(err)
-		}
 
-		subtotal := product.Price * item.Quantity
-		total += subtotal
-	}
-
-	order.Total = total
+	order.Total = request.Total
 
 	// Save order
 	order = s.OrderRepository.Save(ctx, tx, order)
