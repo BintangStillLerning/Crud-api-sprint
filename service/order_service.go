@@ -38,7 +38,6 @@ func (s *orderServiceImpl) Create(ctx context.Context, request web.Order) web.Or
 	}
 	defer tx.Rollback()
 
-	total := 0
 
 	order := web.Order{
 		CustomerName: request.CustomerName,
