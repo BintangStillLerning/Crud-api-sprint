@@ -56,7 +56,7 @@ func (r *orderRepository) SaveItem(ctx context.Context, tx *sql.Tx, item web.Ord
 
 func (r *orderRepository) FindAll(ctx context.Context, db *sql.DB) []domain.Order {
 
-	query := "SELECT id, customer_name, total, payment, status, created_at FROM orderss"
+	query := "SELECT id, costomer_name, total, payment, status, created_at FROM orderss"
 
 	rows, err := db.QueryContext(ctx, query)
 	if err != nil {
