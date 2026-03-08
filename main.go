@@ -72,7 +72,7 @@ func main() {
 	router.GET("/products", productController.FindAll)
 	router.DELETE("/products/:productId", productController.Delete)
 	router.POST("/orders", orderController.Create)
-	router.GET("/orders", orderController.Create)
+	router.GET("/orders", orderController.FindAll)
 	router.PUT("/orders/:ordersId", orderController.Create)
 	
 

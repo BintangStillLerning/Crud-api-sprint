@@ -6,3 +6,4 @@ type Product struct {
 	Price int
 	Image string
 }
+

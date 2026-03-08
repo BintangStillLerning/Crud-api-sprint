@@ -3,12 +3,14 @@ package repository
 import (
 	"context"
 	"database/sql"
+	"golang-api/domain"
 	"golang-api/domain/web"
 )
 
 type OrderRepository interface {
 	Save(ctx context.Context, tx *sql.Tx, order web.Order) web.Order
 	SaveItem(ctx context.Context, tx *sql.Tx, item web.OrderItem)
+	FindAll(ctx context.Context, db *sql.DB) []domain.Order
 }
 
 type orderRepository struct{}
@@ -50,4 +52,38 @@ func (r *orderRepository) SaveItem(ctx context.Context, tx *sql.Tx, item web.Ord
 	if err != nil {
 		panic(err)
 	}
+}
+
+func (r *orderRepository) FindAll(ctx context.Context, db *sql.DB) []domain.Order {
+
+	query := "SELECT id, customer_name, total, payment, status, created_at FROM orderss"
+
+	rows, err := db.QueryContext(ctx, query)
+	if err != nil {
+		panic(err)
+	}
+	defer rows.Close()
+
+	var orders []domain.Order
+
+	for rows.Next() {
+		order := domain.Order{}
+
+		err := rows.Scan(
+			&order.ID,
+			&order.CustomerName,
+			&order.Total,
+			&order.Payment,
+			&order.Status,
+			&order.Created_at,
+		)
+
+		if err != nil {
+			panic(err)
+		}
+
+		orders = append(orders, order)
+	}
+
+	return orders
 }

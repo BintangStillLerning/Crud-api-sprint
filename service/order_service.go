@@ -9,6 +9,7 @@ import (
 
 type OrderService interface {
 	Create(ctx context.Context, request web.Order) web.OrderResponse
+	FindAll(ctx context.Context) []web.OrderResponse
 }
 
 type orderServiceImpl struct {
@@ -89,4 +90,23 @@ func (s *orderServiceImpl) Create(ctx context.Context, request web.Order) web.Or
 		Payment:      order.Payment,
 		Status:       order.Status,
 	}
+	
+}
+
+func (s *orderServiceImpl) FindAll(ctx context.Context) []web.OrderResponse {
+
+	orders := s.OrderRepository.FindAll(ctx, s.DB)
+
+	var responses []web.OrderResponse
+
+	for _, order := range orders {
+
+		responses = append(responses, web.OrderResponse{
+			ID:           order.ID,
+			CustomerName: order.CustomerName,
+			Payment:      order.Payment,
+		})
+	}
+
+	return responses
 }

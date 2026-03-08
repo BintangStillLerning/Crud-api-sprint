@@ -27,7 +27,7 @@ func (c OrderController) Create(w http.ResponseWriter, r *http.Request, _ httpro
 	err := json.NewDecoder(r.Body).Decode(&request)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		return 
+		return
 	}
 
 	response := c.orderService.Create(r.Context(), request)
@@ -36,6 +36,19 @@ func (c OrderController) Create(w http.ResponseWriter, r *http.Request, _ httpro
 	w.WriteHeader(http.StatusCreated)
 
 	err = json.NewEncoder(w).Encode(response)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (c OrderController) FindAll(w http.ResponseWriter, r *http.Request, _ httprouter.Params) {
+
+	response := c.orderService.FindAll(r.Context())
+
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	err := json.NewEncoder(w).Encode(response)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
