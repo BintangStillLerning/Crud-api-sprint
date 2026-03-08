@@ -23,7 +23,7 @@ func NewProductRepository() ProductRepository {
 
 func (r *productRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, product domain.Product) domain.Product {
 	result, err := tx.ExecContext(ctx,
-		"INSERT INTO nicesu(name, price, image) VALUES (?, ?, ?)",
+		"INSERT INTO products (name, price, image) VALUES (?, ?, ?)",
 		product.Name, product.Price, product.Image,
 	)
 	helper.PanicIfError(err)
@@ -38,7 +38,7 @@ func (r *productRepositoryImpl) Save(ctx context.Context, tx *sql.Tx, product do
 func (r *productRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, product domain.Product) domain.Product {
 
 	_, err := tx.ExecContext(ctx,
-		"UPDATE nicesu SET name = ?, price = ?, image = ? WHERE id = ?",
+		"UPDATE products SET name = ?, price = ?, image = ? WHERE id = ?",
 		product.Name, product.Price, product.Image, product.Id,
 	)
 
@@ -50,13 +50,13 @@ func (r *productRepositoryImpl) Update(ctx context.Context, tx *sql.Tx, product 
 }
 
 func (r *productRepositoryImpl) Delete(ctx context.Context, tx *sql.Tx, productId int) {
-	SQL := "DELETE FROM nicesu WHERE id = ?"
+	SQL := "DELETE FROM products WHERE id = ?"
 	_, err := tx.ExecContext(ctx, SQL, productId)
 	helper.PanicIfError(err)
 }
 
 func (r *productRepositoryImpl) FindAll(ctx context.Context, db *sql.DB) []domain.Product {
-	rows, err := db.QueryContext(ctx, "SELECT id, name, price, image FROM nicesu")
+	rows, err := db.QueryContext(ctx, "SELECT id, name, price, image FROM products")
 	helper.PanicIfError(err)
 	defer rows.Close()
 
@@ -75,7 +75,7 @@ func (r *productRepositoryImpl) FindAll(ctx context.Context, db *sql.DB) []domai
 
 func (r *productRepositoryImpl) FindById(ctx context.Context, tx *sql.Tx, productId int) (domain.Product, error) {
 
-	SQL := "SELECT id, name, price, image FROM nicesu WHERE id = ?"
+	SQL := "SELECT id, name, price, image FROM products WHERE id = ?"
 
 	rows, err := tx.QueryContext(ctx, SQL, productId)
 	if err != nil {
