@@ -21,7 +21,7 @@ func NewOrderRepository() OrderRepository {
 
 func (r *orderRepository) Save(ctx context.Context, tx *sql.Tx, order web.Order) web.Order {
 
-	query := "INSERT INTO orderss(customer_name, total, payment, status, created_at) VALUES (?, ?, ?, ?, NOW())"
+	query := "INSERT INTO orderss(costomer_name, total, payment, status, created_at) VALUES (?, ?, ?, ?, NOW())"
 
 	result, err := tx.ExecContext(ctx, query,
 		order.CustomerName,
@@ -42,7 +42,7 @@ func (r *orderRepository) Save(ctx context.Context, tx *sql.Tx, order web.Order)
 
 func (r *orderRepository) SaveItem(ctx context.Context, tx *sql.Tx, item web.OrderItem) {
 
-	query := "INSERT INTO order_items(product_id, quantity) VALUES (?, ?)"
+	query := "INSERT INTO order_item(product_id, quantity) VALUES (?, ?)"
 
 	_, err := tx.ExecContext(ctx, query,
 		item.ProductID,
